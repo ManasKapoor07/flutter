@@ -12,6 +12,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.9
+  animated_text_kit: ^4.2.2
+
 
 dev_dependencies:
   flutter_test:
@@ -23,3 +25,7 @@ flutter:
   assets:
     - assets/images/bath.jpg
     - assets/images/logo.png
+    - assets/images/generate.png
+    - assets/images/google.png
+
+

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'screens/hero_section.dart';
+import 'screens/CreateAccountPage.dart'; // <<--- updated
 
 void main() {
   runApp(const MyApp());
@@ -8,7 +8,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,31 +31,42 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeIn;
+    with TickerProviderStateMixin {
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
+
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-
-    _controller = AnimationController(
+    _scaleController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
+    _scaleAnimation = Tween<double>(
+      begin: 0.6,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _scaleController, curve: Curves.easeOut));
+    _scaleController.forward();
 
-    _fadeIn = Tween<double>(
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(
       begin: 0,
       end: 1,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeIn));
+    _fadeController.forward();
 
-    _controller.forward();
-
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(milliseconds: 3000), () {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 800),
-          pageBuilder: (_, __, ___) => const HeroSection(),
+          pageBuilder: (_, __, ___) =>
+              const CreateAccountPage(), // <<--- updated
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(opacity: animation, child: child);
           },
@@ -67,44 +77,56 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _scaleController.dispose();
+    _fadeController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Center(
-        child: FadeTransition(
-          opacity: _fadeIn,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo from assets
-              Image.asset('assets/images/logo.png', height: 120),
-              const SizedBox(height: 20),
-
-              const Text(
-                'Maheshwar & Co.',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color.fromARGB(
+                      255,
+                      192,
+                      192,
+                      192,
+                    ).withOpacity(0.35),
+                    blurRadius: 36,
+                    spreadRadius: 8,
+                  ),
+                ],
+              ),
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  height: 130,
+                  fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'All Brands • One Roof • AR Preview',
-                style: TextStyle(fontSize: 15, color: Colors.grey),
+            ),
+            const SizedBox(height: 20),
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: const Text(
+                "All Brands • One Roof • AR Preview",
+                style: TextStyle(
+                  color: Color.fromARGB(179, 0, 0, 0),
+                  fontSize: 16,
+                  letterSpacing: 1.2,
+                ),
               ),
-              const SizedBox(height: 30),
-              const CircularProgressIndicator(
-                color: Colors.blueGrey,
-                strokeWidth: 2.5,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
