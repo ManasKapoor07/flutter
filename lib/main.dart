@@ -1,33 +1,28 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'screens/CreateAccountPage.dart'; // <<--- updated
+import 'package:flutter_application_1/screens/ProductListing.dart';
+import 'package:flutter_application_1/screens/hero_section.dart';
+import 'package:flutter_application_1/screens/login_page.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+// Dummy placeholder for your CreateAccountPage, HeroSection, ProductListing, ProfilePage
+// Replace with your actual imports in your real app.
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({Key? key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Maheshwar & Co.',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
-        useMaterial3: true,
-        fontFamily: 'Roboto',
-      ),
-      home: const SplashScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Profile')),
+    body: Center(child: Text('User Profile')),
+  );
 }
 
+// SplashScreen with transition to MainPage after 3 seconds
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen>
@@ -41,6 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+
     _scaleController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -65,11 +61,9 @@ class _SplashScreenState extends State<SplashScreen>
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 800),
-          pageBuilder: (_, __, ___) =>
-              const CreateAccountPage(), // <<--- updated
-          transitionsBuilder: (_, animation, __, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
+          pageBuilder: (_, __, ___) => const LoginPage(),
+          transitionsBuilder: (_, animation, __, child) =>
+              FadeTransition(opacity: animation, child: child),
         ),
       );
     });
@@ -85,33 +79,17 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color.fromARGB(
-                      255,
-                      192,
-                      192,
-                      192,
-                    ).withOpacity(0.35),
-                    blurRadius: 36,
-                    spreadRadius: 8,
-                  ),
-                ],
-              ),
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: Image.asset(
-                  'assets/images/logo.png',
-                  height: 130,
-                  fit: BoxFit.contain,
-                ),
+            ScaleTransition(
+              scale: _scaleAnimation,
+              child: Image.asset(
+                'assets/images/logo.png',
+                height: 130,
+                fit: BoxFit.contain,
               ),
             ),
             const SizedBox(height: 20),
@@ -120,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen>
               child: const Text(
                 "All Brands • One Roof • AR Preview",
                 style: TextStyle(
-                  color: Color.fromARGB(179, 0, 0, 0),
+                  color: Colors.black54,
                   fontSize: 16,
                   letterSpacing: 1.2,
                 ),
@@ -131,4 +109,62 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
+}
+
+// MainPage with Bottom Navigation Bar hosting pages
+class MainPage extends StatefulWidget {
+  const MainPage({Key? key}) : super(key: key);
+
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  int _selectedIndex = 0;
+
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    _pages = [
+      const HeroSection(primaryBlue: Colors.blue),
+      const ProductListing(accentColor: Colors.blue),
+      const ProfilePage(),
+    ];
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag),
+            label: 'Products',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+      ),
+    );
+  }
+}
+
+void main() {
+  runApp(
+    const MaterialApp(home: SplashScreen(), debugShowCheckedModeBanner: false),
+  );
 }
